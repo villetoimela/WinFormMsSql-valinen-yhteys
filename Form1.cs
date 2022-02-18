@@ -90,7 +90,6 @@ namespace WinFormMsSql_valinen_yhteys
                 delcmd.ExecuteNonQuery();
                 conn.Close();
                 dataGridView1.Rows.RemoveAt(dataGridView1.SelectedRows[0].Index);
-                MessageBox.Show("Tietue poistettu!!");
             }
         }
 
