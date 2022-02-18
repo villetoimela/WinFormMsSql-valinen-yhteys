@@ -20,7 +20,7 @@ namespace WinFormMsSql_valinen_yhteys
             InitializeComponent();
         }
 
-        public void SqlConnectionAvattu()
+        public void SqlConnectionOn()
         {
             try
             {
@@ -32,7 +32,7 @@ namespace WinFormMsSql_valinen_yhteys
             }
         }
 
-        public void SqlConnetionSuljettu()
+        public void SqlConnetionOff()
         {
             try
             {
@@ -44,7 +44,67 @@ namespace WinFormMsSql_valinen_yhteys
             }
         }
 
+        private void buttonLisaa_Click(object sender, EventArgs e)
+        {
+            SqlConnectionOn();
 
+            SqlCommand myCommand = new SqlCommand("SET IDENTITY_INSERT Nimi ON; INSERT INTO Nimi (Id, Nimi, opintoryhma_Id) " +
+                                     "Values('" + OpiskelijaIDtextBox.Text + "','" + NimitextBox.Text + "','" + RyhmanIDtextBox.Text + "') SET IDENTITY_INSERT Nimi OFF;", myConnection);
+            myCommand.ExecuteNonQuery();
+            SqlConnetionOff();
+        }
 
+        private void Haebutton_Click(object sender, EventArgs e)
+        {
+            using (SqlConnection myConnection = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Opiskelijat;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"))
+            {
+                SqlConnectionOn();
+                SqlDataAdapter Adapteri = new SqlDataAdapter("SELECT * FROM Nimi", myConnection);
+                DataTable Datataulu = new DataTable();
+                Adapteri.Fill(Datataulu);
+                dataGridView1.DataSource = Datataulu;
+                SqlConnetionOff();
+            }
+        }
+
+        private void PoistaTietuebutton_Click(object sender, EventArgs e)
+        {
+            Poista_Tietue();
+
+            foreach (DataGridViewRow item in this.dataGridView1.SelectedRows)
+            {
+                dataGridView1.Rows.RemoveAt(item.Index);
+            }
+        }
+
+        private void Poista_Tietue()
+        {
+            SqlConnection conn = new SqlConnection();
+            SqlCommand delcmd = new SqlCommand();
+            conn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Opiskelijat;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            if (dataGridView1.Rows.Count > 1 && dataGridView1.SelectedRows[0].Index != dataGridView1.Rows.Count - 1)
+            {
+                delcmd.CommandText = "DELETE FROM Nimi WHERE Id=" + dataGridView1.SelectedRows[0].Cells[0].Value.ToString() + "";
+                conn.Open();
+                delcmd.Connection = conn;
+                delcmd.ExecuteNonQuery();
+                conn.Close();
+                dataGridView1.Rows.RemoveAt(dataGridView1.SelectedRows[0].Index);
+                MessageBox.Show("Tietue poistettu!!");
+            }
+        }
+
+        private void HaeRyhmabutton_Click(object sender, EventArgs e)
+        {
+            using (SqlConnection myConnection = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Opiskelijat;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"))
+            {
+                SqlConnectionOn();
+                SqlDataAdapter Adapteri = new SqlDataAdapter("SELECT * FROM Ryhma", myConnection);
+                DataTable Datataulu = new DataTable();
+                Adapteri.Fill(Datataulu);
+                dataGridView2.DataSource = Datataulu;
+                SqlConnetionOff();
+            }
+        }
     }
 }
